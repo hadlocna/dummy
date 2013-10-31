@@ -1,21 +1,43 @@
 enable :sessions
 
 get '/' do
-  # Look in app/views/index.erb
-  # session[:message] = 'Hello World!'
-  erb :index
+  puts session[:id]
+  if session[:id]== nil
+    erb :index
+  else
+    erb :welcome
+  end
 end
 
 post '/new_user' do
-  # Look in app/views/index.erb
-  # session[:message] = 'Hello World!'
+  new_user = User.new(first_name: params[:first_name],
+                         last_name: params[:last_name],
+                         email: params[:email],
+                         password: params[:password])
   erb :welcome
 end
 
-get '/login' do
+get '/user_login_page' do
+
+  # p User.find_by_first_name(params[:first_name]).id
   # Look in app/views/index.erb
   # session[:message] = 'Hello World!'
-  erb :welcome
+  erb :login
+end
+
+get '/user_login' do
+  if User.authenticate?(params[:first_name], params[:password])
+    session[:id] = User.find_by_first_name(params[:first_name]).id
+    erb :welcome
+  else
+    erb :index
+  end
+end
+
+
+get '/user_logout' do
+  session.clear
+  erb :index
 end
 
 # use Rack::Session::Cookie, :key => 'rack.session',
